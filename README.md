@@ -1,3 +1,5 @@
+![splash image](images/GoClock.png) 
+
 # GoClock
 another clock in Golang
 
