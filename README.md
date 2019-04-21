@@ -2,7 +2,9 @@
 
 # GoClock
 another clock in Golang    
-only tested on Linux Mint 19 64b
+only tested on Linux Mint 19 64b    
+
+mouse Button 3 open POPUP menu
 
 goal is to check complexity against [Racket Clock](https://github.com/nodrygo/RktAlarmClock) and [Julia Clock](https://github.com/nodrygo/jAnalogAlarmClock) 
 
@@ -32,5 +34,5 @@ for __Go__ I use [LiteIDE X](https://liteide.org/en/) : _not so bad (better than
 
 # TO DO    
 alarm part   
-right click menu  (set alarm / switch decoration / quit)  
+right click menu  (set alarm)  
 

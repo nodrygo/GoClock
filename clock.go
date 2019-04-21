@@ -1,3 +1,6 @@
+// Gtk Go Clock demo
+// License MIT
+
 package main
 
 import (
@@ -23,6 +26,7 @@ var wfy float64
 var radius float64
 var lastTime time.Time
 
+// returnwindows size
 func getWinSize(win *gtk.Window) (float64, float64, float64) {
 	wx, wy := win.GetSize()
 	wfx := float64(wx)
@@ -31,6 +35,7 @@ func getWinSize(win *gtk.Window) (float64, float64, float64) {
 	return wfx, wfy, radius
 }
 
+// draw neddles
 func drawNeddle(cr *cairo.Context, cx, cy, cl, siz, angle float64) {
 	cr.Save()
 	cr.MoveTo(cx, cy)
@@ -42,6 +47,8 @@ func drawNeddle(cr *cairo.Context, cx, cy, cl, siz, angle float64) {
 	cr.Stroke()
 	cr.Restore()
 }
+
+// draw face minutes decorations
 func drawMinutes(cr *cairo.Context, cx, cy, halfrad float64) {
 	lstart := halfrad - halfrad/4
 	lend := lstart + 14
@@ -70,7 +77,7 @@ func drawMinutes(cr *cairo.Context, cx, cy, halfrad float64) {
 		case 4, 5:
 			cr.MoveTo(cx+tdw+lend*math.Sin(angle), cy+4.0+tdh+lend*math.Cos(angle))
 		case 6:
-			cr.MoveTo(cx-tdw+lend*math.Sin(angle), cy+tdh*2+lend*math.Cos(angle))
+			cr.MoveTo(cx-tdw+lend*math.Sin(angle), cy+2+tdh*2+lend*math.Cos(angle))
 		case 7, 8:
 			cr.MoveTo(cx+(tdw*2+4.0+lend)*math.Sin(angle), cy+(tdh*2+4.0+lend)*math.Cos(angle))
 		case 9:
@@ -85,13 +92,14 @@ func drawMinutes(cr *cairo.Context, cx, cy, halfrad float64) {
 	}
 	cr.Restore()
 }
+
+// draw clock face
 func drawFace(cr *cairo.Context, cx, cy, halfrad float64) {
 	h := 0
 	cr.SetSourceRGB(255, 255, 255)
 	cr.Paint()
 	cr.ShowText(string(h))
 	cr.SetSourceRGB(255, 0, 0)
-	//p, _ := cairo.NewPatternLinear()l(cx, cy, 0, cx+halfrad, cy+halfrad, halfrad)
 	p, _ := cairo.NewPatternLinear(0, 0, cx+halfrad, cy+halfrad)
 	p.AddColorStopRGBA(0, 255, 0, 0, 0.3)
 	p.AddColorStopRGBA(0.5, 255, 255, 0, 0.3)
@@ -107,6 +115,7 @@ func drawFace(cr *cairo.Context, cx, cy, halfrad float64) {
 
 }
 
+// main draw fct when canvas need redraw
 func drawClock(cr *cairo.Context) {
 	hour, min, sec := lastTime.Clock()
 	pi := math.Pi
@@ -130,13 +139,14 @@ func drawClock(cr *cairo.Context) {
 	cr.Fill()
 }
 
+// hack to handle clock time seconds
 func handleTick(widget *gtk.Widget, frameClock *gdk.FrameClock, userData uintptr) bool {
 	_ = frameClock
 	_, _, ls := lastTime.Clock()
-	hour, min, sec := time.Now().Clock()
+	_, _, sec := time.Now().Clock()
 	if ls != sec {
 		lastTime = time.Now()
-		fmt.Printf("Time:  %d:%d:%d\n", hour, min, sec)
+		//fmt.Printf("Time:  %d:%d:%d\n", hour, min, sec)
 		widget.QueueDraw()
 	}
 	return true
@@ -151,15 +161,21 @@ func main() {
 	win.SetTitle("Clock")
 	win.Connect("destroy", gtk.MainQuit)
 
+	// define the popp menu
 	popupmenu, _ := gtk.MenuNew()
 	psetAlarm, _ := gtk.MenuItemNew()
 	psetAlarm.SetLabel("Set Alarm")
-	psetAlarm.SetName("SetAlarm")
 	pswitchDeco, _ := gtk.MenuItemNew()
 	pswitchDeco.SetLabel("Switch decoration")
+	pquit, _ := gtk.MenuItemNew()
+	pquit.SetLabel("Quit")
+	psep, _ := gtk.SeparatorMenuItemNew()
 	popupmenu.Append(psetAlarm)
 	popupmenu.Append(pswitchDeco)
+	popupmenu.Append(psep)
+	popupmenu.Append(pquit)
 
+	// set Show for everything
 	win.ShowAll()
 	popupmenu.ShowAll()
 
@@ -168,8 +184,11 @@ func main() {
 	wfx, wfy, radius = getWinSize(win)
 	lastTime = time.Now()
 	clkcanvas.AddTickCallback(handleTick, 1000)
-	// Event handlers
 
+	// Event handlers
+	pquit.Connect("activate", func() {
+		gtk.MainQuit()
+	})
 	pswitchDeco.Connect("activate", func() {
 		fmt.Println("menuitem pswitchDeco")
 		if win.GetDecorated() {
@@ -200,7 +219,7 @@ func main() {
 		}
 	})
 
-	// Another way to create timer
+	// Another way to create timer with concurrency
 	// go func() {
 	// 	for now := range time.Tick(time.Second) {
 	// 		fmt.Println(now)
