@@ -44,7 +44,7 @@ func drawNeddle(cr *cairo.Context, cx, cy, cl, siz, angle float64) {
 }
 func drawMinutes(cr *cairo.Context, cx, cy, halfrad float64) {
 	lstart := halfrad - halfrad/4
-	lend := lstart + 15
+	lend := lstart + 14
 	cr.Save()
 	cr.SelectFontFace("Helvetica", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 	cr.SetFontSize(halfrad / 10)
@@ -150,12 +150,37 @@ func main() {
 	win.Add(clkcanvas)
 	win.SetTitle("Clock")
 	win.Connect("destroy", gtk.MainQuit)
+
+	popupmenu, _ := gtk.MenuNew()
+	psetAlarm, _ := gtk.MenuItemNew()
+	psetAlarm.SetLabel("Set Alarm")
+	psetAlarm.SetName("SetAlarm")
+	pswitchDeco, _ := gtk.MenuItemNew()
+	pswitchDeco.SetLabel("Switch decoration")
+	popupmenu.Append(psetAlarm)
+	popupmenu.Append(pswitchDeco)
+
 	win.ShowAll()
-	win.SetOpacity(0.85)
+	popupmenu.ShowAll()
+
+	win.SetOpacity(0.8)
+	clkcanvas.SetOpacity(1)
 	wfx, wfy, radius = getWinSize(win)
 	lastTime = time.Now()
 	clkcanvas.AddTickCallback(handleTick, 1000)
 	// Event handlers
+
+	pswitchDeco.Connect("activate", func() {
+		fmt.Println("menuitem pswitchDeco")
+		if win.GetDecorated() {
+			win.SetDecorated(false)
+			win.SetOpacity(0.8)
+		} else {
+			win.SetDecorated(true)
+			win.SetOpacity(0.8)
+		}
+	})
+
 	win.Connect("check_resize", func(win *gtk.Window) {
 		wfx, wfy, radius = getWinSize(win)
 	})
@@ -163,13 +188,19 @@ func main() {
 	clkcanvas.Connect("draw", func(da *gtk.DrawingArea, cr *cairo.Context) {
 		drawClock(cr)
 	})
-	// win.Connect("key-press-event", func(win *gtk.Window, ev *gdk.Event) {
-	// 	keyEvent := &gdk.EventKey{ev}
-	// 	if move, found := keyMap[keyEvent.KeyVal()]; found {
-	// 		move()
-	// 		win.QueueDraw()
-	// 	}
-	// })
+	win.Connect("button-press-event", func(win *gtk.Window, ev *gdk.Event) {
+		fmt.Println("Event", ev)
+		button := &gdk.EventButton{ev}
+		if button.Button() == 3 {
+			// posx := button.X()
+			// posy := button.Y()
+			//fmt.Println("Button 3 detected ", posx, ":", posy)
+			popupmenu.PopupAtPointer(ev)
+			win.QueueDraw()
+		}
+	})
+
+	// Another way to create timer
 	// go func() {
 	// 	for now := range time.Tick(time.Second) {
 	// 		fmt.Println(now)
