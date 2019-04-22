@@ -26,16 +26,16 @@ var wfy float64
 var radius float64
 var lastTime time.Time
 
-// returnwindows size
+// return windows size and radius
 func getWinSize(win *gtk.Window) (float64, float64, float64) {
 	wx, wy := win.GetSize()
 	wfx := float64(wx)
 	wfy := float64(wy)
-	radius := math.Min(wfx, wfy)
+	radius := math.Min(wfx, wfy) / 2
 	return wfx, wfy, radius
 }
 
-// draw neddles
+// draw neddles at angle stat at cx,cy for length cl and width siz
 func drawNeddle(cr *cairo.Context, cx, cy, cl, siz, angle float64) {
 	cr.Save()
 	cr.MoveTo(cx, cy)
@@ -48,13 +48,13 @@ func drawNeddle(cr *cairo.Context, cx, cy, cl, siz, angle float64) {
 	cr.Restore()
 }
 
-// draw face minutes decorations
-func drawMinutes(cr *cairo.Context, cx, cy, halfrad float64) {
-	lstart := halfrad - halfrad/4
+// draw face minutes decorations for each 5mn center cx,cy with radius
+func drawMinutes(cr *cairo.Context, cx, cy, radius float64) {
+	lstart := radius - radius/4
 	lend := lstart + 14
 	cr.Save()
 	cr.SelectFontFace("Helvetica", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-	cr.SetFontSize(halfrad / 10)
+	cr.SetFontSize(radius / 10)
 	cr.MoveTo(cx, cy)
 	cr.SetSourceRGB(0, 0, 0)
 	cr.SetLineWidth(2)
@@ -67,6 +67,7 @@ func drawMinutes(cr *cairo.Context, cx, cy, halfrad float64) {
 		tsize := cr.TextExtents(fmt.Sprint(i))
 		tdh := tsize.Height / 2
 		tdw := tsize.Width / 2
+		// adapt text pos according minutes pos and text size
 		switch i {
 		default:
 			cr.MoveTo(cx+(lend-tdw)*math.Sin(angle), cy+(lend+tdh)*math.Cos(angle))
@@ -94,24 +95,24 @@ func drawMinutes(cr *cairo.Context, cx, cy, halfrad float64) {
 }
 
 // draw clock face
-func drawFace(cr *cairo.Context, cx, cy, halfrad float64) {
+func drawFace(cr *cairo.Context, cx, cy, radius float64) {
 	h := 0
 	cr.SetSourceRGB(255, 255, 255)
 	cr.Paint()
 	cr.ShowText(string(h))
 	cr.SetSourceRGB(255, 0, 0)
-	p, _ := cairo.NewPatternLinear(0, 0, cx+halfrad, cy+halfrad)
+	p, _ := cairo.NewPatternLinear(0, 0, cx+radius, cy+radius)
 	p.AddColorStopRGBA(0, 255, 0, 0, 0.3)
 	p.AddColorStopRGBA(0.5, 255, 255, 0, 0.3)
 	p.AddColorStopRGBA(1, 255, 0, 255, 0.3)
 	cr.SetSource(p)
-	cr.Arc(cx, cy, halfrad, 0, math.Pi*2)
+	cr.Arc(cx, cy, radius, 0, math.Pi*2)
 	cr.Fill()
 	cr.SetLineWidth(3)
 	cr.SetSourceRGB(0, 0, 0)
-	cr.Arc(cx, cy, halfrad, 0, math.Pi*2)
+	cr.Arc(cx, cy, radius, 0, math.Pi*2)
 	cr.Stroke()
-	drawMinutes(cr, cx, cy, halfrad)
+	drawMinutes(cr, cx, cy, radius)
 
 }
 
@@ -123,19 +124,19 @@ func drawClock(cr *cairo.Context) {
 	hangle := pi + (float64(hour+min/90) * -(pi / 6.0))
 	mangle := pi + (float64(min) * -(pi / 30.0))
 	sangle := pi + (float64(sec) * -(pi / 30.0))
-	halfrad := (radius / 2) - 4
+	maxradius := radius - 4
 	cx := wfx / 2
 	cy := wfy / 2
 	// draw clock face
-	drawFace(cr, cx, cy, halfrad)
+	drawFace(cr, cx, cy, maxradius)
 	// draw second
-	drawNeddle(cr, cx, cy, halfrad-10.0, 2.0, sangle)
+	drawNeddle(cr, cx, cy, maxradius-10.0, 2.0, sangle)
 	// draw min
-	drawNeddle(cr, cx, cy, halfrad-(halfrad/3), 4.0, mangle)
+	drawNeddle(cr, cx, cy, maxradius-(maxradius/3), 4.0, mangle)
 	// draw hour
-	drawNeddle(cr, cx, cy, halfrad-(halfrad/2), 8.0, hangle)
+	drawNeddle(cr, cx, cy, maxradius-(maxradius/2), 8.0, hangle)
 	cr.SetSourceRGB(0, 0, 0)
-	cr.Arc(cx, cy, halfrad/14, 0, math.Pi*2)
+	cr.Arc(cx, cy, maxradius/14, 0, math.Pi*2)
 	cr.Fill()
 }
 
