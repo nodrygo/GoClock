@@ -65,15 +65,23 @@ func stopColorConvertAlpha(stop float64, c color.RGBA, alpha float64) (s, r, g, 
 }
 
 // draw neddles at angle stat at cx,cy for length cl and width siz
-func drawNeddle(cr *cairo.Context, cx, cy, cl, siz, angle float64) {
+func drawNeddle(cr *cairo.Context, cx, cy, cl, siz float64, col color.RGBA, angle float64) {
 	cr.Save()
 	cr.MoveTo(cx, cy)
-	r, g, b := colorConvert(colornames.Chocolate)
+	r, g, b := colorConvert(col)
 	//fmt.Println("color", r, " ", b, " ", g)
 	cr.SetSourceRGBA(r, g, b, 0.8)
 	cr.SetLineWidth(siz)
 	cr.LineTo(cx+cl*math.Sin(angle), cy+cl*math.Cos(angle))
 	cr.Stroke()
+	//cr.NewPath()
+	//cr.MoveTo(cx, cy)
+	//r, g, b = colorConvert(colornames.Coral)
+	//fmt.Println("color", r, " ", b, " ", g)
+	cr.SetSourceRGBA(r, g, b, 0.8)
+	cr.Arc(cx+(cl/1.8)*math.Sin(angle), cy+(cl/1.8)*math.Cos(angle), cx/20, 0, math.Pi*2)
+	//cr.ClosePath()
+	cr.Fill()
 	cr.Restore()
 }
 
@@ -134,12 +142,12 @@ func drawFace(cr *cairo.Context, cx, cy, radius float64) {
 	cr.ShowText(string(h))
 	// set color gradian
 	p, _ := cairo.NewPatternLinear(0, 0, cx+radius, cy+radius)
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.0, colornames.Darkred, 0.3))
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.25, colornames.Red, 0.3))
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.45, colornames.Green, 0.3))
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.60, colornames.Darkgreen, 0.3))
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.8, colornames.Blue, 0.3))
-	p.AddColorStopRGBA(stopColorConvertAlpha(1.0, colornames.Darkblue, 0.3))
+	p.AddColorStopRGBA(stopColorConvertAlpha(0.0, colornames.Red, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(0.20, colornames.Pink, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(0.50, colornames.Lightgreen, 0.5))
+	//p.AddColorStopRGBA(stopColorConvertAlpha(0.60, colornames.Lightgreen, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(0.80, colornames.Lightsteelblue, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(1.0, colornames.Blueviolet, 0.5))
 	cr.SetSource(p)
 	cr.Arc(cx, cy, radius, 0, math.Pi*2)
 	cr.Fill()
@@ -167,17 +175,17 @@ func drawClock(cr *cairo.Context) {
 	drawFace(cr, cx, cy, maxradius)
 
 	// draw second
-	drawNeddle(cr, cx, cy, maxradius-10.0, 2.0, sangle)
+	drawNeddle(cr, cx, cy, maxradius-10.0, 2.0, colornames.Chocolate, sangle)
 	// draw min
-	drawNeddle(cr, cx, cy, maxradius-(maxradius/3), 4.0, mangle)
+	drawNeddle(cr, cx, cy, maxradius-(maxradius/3), 4.0, colornames.Maroon, mangle)
 	// draw hour
-	drawNeddle(cr, cx, cy, maxradius-(maxradius/2), 8.0, hangle)
+	drawNeddle(cr, cx, cy, maxradius-(maxradius/2), 8.0, colornames.Firebrick, hangle)
 	cr.SetSourceRGB(0, 0, 0)
 	//draw center point
 	cr.Arc(cx, cy, maxradius/14, 0, math.Pi*2)
 	cr.Fill()
 
-	// draw digital clock inside clock
+	// draw digital clock inside the clock
 	r, g, b := colorConvert(colornames.Darkblue)
 	cr.SetSourceRGB(r, g, b)
 	cr.SelectFontFace("Helvetica", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
@@ -192,7 +200,7 @@ func drawClock(cr *cairo.Context) {
 	tsize = cr.TextExtents(txtdate)
 	tdh = tsize.Height / 2
 	tdw = tsize.Width / 2
-	cr.MoveTo(cx-tdw, cy-maxradius/5)
+	cr.MoveTo(cx-tdw, cy-maxradius/6)
 	cr.ShowText(txtdate)
 }
 
@@ -223,12 +231,15 @@ func main() {
 	psetAlarm.SetLabel("Set Alarm")
 	pswitchDeco, _ := gtk.MenuItemNew()
 	pswitchDeco.SetLabel("Switch decoration")
+	pabout, _ := gtk.MenuItemNew()
+	pabout.SetLabel("About")
 	pquit, _ := gtk.MenuItemNew()
 	pquit.SetLabel("Quit")
 	psep, _ := gtk.SeparatorMenuItemNew()
 	popupmenu.Append(psetAlarm)
 	popupmenu.Append(pswitchDeco)
 	popupmenu.Append(psep)
+	popupmenu.Append(pabout)
 	popupmenu.Append(pquit)
 
 	// set Show for everything
@@ -242,11 +253,18 @@ func main() {
 	clkcanvas.AddTickCallback(handleTick, 1000)
 
 	// Event handlers
+	pabout.Connect("activate", func() {
+		setAboutDlg()
+	})
+	psetAlarm.Connect("activate", func() {
+		fmt.Println("Activate Setalarm")
+		setAlarmDlg()
+	})
 	pquit.Connect("activate", func() {
 		gtk.MainQuit()
 	})
 	pswitchDeco.Connect("activate", func() {
-		fmt.Println("menuitem pswitchDeco")
+		//fmt.Println("menuitem pswitchDeco")
 		if win.GetDecorated() {
 			win.SetDecorated(false)
 			win.SetOpacity(0.9)
@@ -266,7 +284,7 @@ func main() {
 		drawClock(cr)
 	})
 	win.Connect("button-press-event", func(win *gtk.Window, ev *gdk.Event) {
-		fmt.Println("Event", ev)
+		//fmt.Println("Event", ev)
 		button := &gdk.EventButton{ev}
 		if button.Button() == 3 {
 			// posx := button.X()
