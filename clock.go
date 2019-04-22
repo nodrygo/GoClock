@@ -50,14 +50,14 @@ func drawNeddle(cr *cairo.Context, cx, cy, cl, siz, angle float64) {
 
 // draw face minutes decorations for each 5mn center cx,cy with radius
 func drawMinutes(cr *cairo.Context, cx, cy, radius float64) {
-	lstart := radius - radius/4
-	lend := lstart + 14
+	lstart := radius - radius/3.8
+	lend := lstart + radius/10
 	cr.Save()
 	cr.SelectFontFace("Helvetica", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 	cr.SetFontSize(radius / 10)
 	cr.MoveTo(cx, cy)
 	cr.SetSourceRGB(0, 0, 0)
-	cr.SetLineWidth(2)
+	cr.SetLineWidth(3)
 	for i := 12; i > 0; i-- {
 		angle := (float64(i*5) * -(math.Pi / 30.0)) + math.Pi
 		cr.MoveTo(cx+lstart*math.Sin(angle), cy+lstart*math.Cos(angle))
@@ -119,6 +119,7 @@ func drawFace(cr *cairo.Context, cx, cy, radius float64) {
 // main draw fct when canvas need redraw
 func drawClock(cr *cairo.Context) {
 	hour, min, sec := lastTime.Clock()
+	yy, mm, dd := lastTime.Date()
 	pi := math.Pi
 	//halfpi := pi / 2
 	hangle := pi + (float64(hour+min/90) * -(pi / 6.0))
@@ -136,8 +137,24 @@ func drawClock(cr *cairo.Context) {
 	// draw hour
 	drawNeddle(cr, cx, cy, maxradius-(maxradius/2), 8.0, hangle)
 	cr.SetSourceRGB(0, 0, 0)
+	//draw center point
 	cr.Arc(cx, cy, maxradius/14, 0, math.Pi*2)
 	cr.Fill()
+	// draw digital clock inside clock
+	cr.SelectFontFace("Helvetica", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+	cr.SetFontSize(radius / 5)
+	txttime := fmt.Sprintf("%02d:%02d:%02d", hour, min, sec)
+	tsize := cr.TextExtents(txttime)
+	tdh := tsize.Height / 2
+	tdw := tsize.Width / 2
+	cr.MoveTo(cx-tdw, cy+maxradius/2.8-tdh)
+	cr.ShowText(txttime)
+	txtdate := fmt.Sprintf("%02d/%02d/%4d", dd, mm, yy)
+	tsize = cr.TextExtents(txtdate)
+	tdh = tsize.Height / 2
+	tdw = tsize.Width / 2
+	cr.MoveTo(cx-tdw, cy-maxradius/5)
+	cr.ShowText(txtdate)
 }
 
 // hack to handle clock time seconds
@@ -147,7 +164,6 @@ func handleTick(widget *gtk.Widget, frameClock *gdk.FrameClock, userData uintptr
 	_, _, sec := time.Now().Clock()
 	if ls != sec {
 		lastTime = time.Now()
-		//fmt.Printf("Time:  %d:%d:%d\n", hour, min, sec)
 		widget.QueueDraw()
 	}
 	return true
