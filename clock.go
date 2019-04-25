@@ -77,6 +77,13 @@ func drawHMneddle(cr *cairo.Context, cx, cy, cl, siz float64, col color.RGBA, an
 	cr.LineTo(cl/3, -cl/10)
 	cr.LineTo(0, 0)
 	cr.Fill()
+	cr.SetSourceRGBA(0, 0, 1, 0.5)
+	cr.MoveTo(0, 0)
+	cr.LineTo(cl/3, cl/10)
+	cr.LineTo(cl, 0)
+	cr.LineTo(cl/3, -cl/10)
+	cr.LineTo(0, 0)
+	cr.Stroke()
 	cr.Restore()
 }
 
@@ -155,25 +162,24 @@ func drawGraduations(cr *cairo.Context, cx, cy, radius float64) {
 
 // draw clock face
 func drawFace(cr *cairo.Context, cx, cy, radius float64) {
-	h := 0
-	cr.SetSourceRGBA(255, 255, 255, 0)
+	cr.SetSourceRGBA(255, 255, 255, 1)
+	cr.Arc(cx, cy, radius, 0, math.Pi*2)
 	cr.Paint()
-
+	h := 0
 	cr.SetSourceRGB(colorConvert(colornames.Chocolate))
 	cr.ShowText(string(h))
 	// set color gradian
 	p, _ := cairo.NewPatternLinear(0, 0, cx+radius, cy+radius)
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.0, colornames.Red, 0.5))
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.20, colornames.Pink, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(0, colornames.Blueviolet, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(0.30, colornames.Lightsteelblue, 0.5))
 	p.AddColorStopRGBA(stopColorConvertAlpha(0.50, colornames.Lightgreen, 0.5))
-	//p.AddColorStopRGBA(stopColorConvertAlpha(0.60, colornames.Lightgreen, 0.5))
-	p.AddColorStopRGBA(stopColorConvertAlpha(0.80, colornames.Lightsteelblue, 0.5))
-	p.AddColorStopRGBA(stopColorConvertAlpha(1.0, colornames.Blueviolet, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(0.80, colornames.Pink, 0.5))
+	p.AddColorStopRGBA(stopColorConvertAlpha(1.0, colornames.Red, 0.5))
 	cr.SetSource(p)
 	cr.Arc(cx, cy, radius, 0, math.Pi*2)
 	cr.Fill()
 	cr.SetLineWidth(3)
-	cr.SetSourceRGB(0, 0, 0)
+	cr.SetSourceRGB(colorConvert(colornames.Darkslateblue))
 	cr.Arc(cx, cy, radius, 0, math.Pi*2)
 	cr.Stroke()
 	drawGraduations(cr, cx, cy, radius)
@@ -181,6 +187,9 @@ func drawFace(cr *cairo.Context, cx, cy, radius float64) {
 
 // main draw fct when canvas need redraw
 func drawClock(cr *cairo.Context) {
+
+	//cr.SetSourceRGBA(255, 255, 255, 0)
+	//cr.Paint()
 	hour, min, sec := lastTime.Clock()
 	yy, mm, dd := lastTime.Date()
 	hangle := (float64(hour+min/90) * (math.Pi / 6.0)) - math.Pi/2
@@ -293,12 +302,13 @@ func main() {
 		if win.GetDecorated() {
 			win.SetDecorated(false)
 			win.SetOpacity(0.9)
+			clkcanvas.SetOpacity(0.8)
 			win.ShowAll()
-			clkcanvas.SetOpacity(1)
+
 		} else {
 			win.SetDecorated(true)
 			win.SetOpacity(0.9)
-			clkcanvas.SetOpacity(1)
+			clkcanvas.SetOpacity(0.8)
 			win.ShowAll()
 		}
 	})
