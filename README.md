@@ -59,7 +59,7 @@ __Racket__ compiled run with ~ 160Mo memory
 __Julia__ run need ~300Mo  of memory    
 
 
-Wil  try to rewrite one with __[V](vlang.io)__ in June when avalaible ;-)    
+Wil  try to rewrite one with __[V](https://vlang.io/)__ in June when avalaible ;-)    
 
 # TO DO        
 alarm part   
