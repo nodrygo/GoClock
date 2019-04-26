@@ -192,9 +192,9 @@ func drawClock(cr *cairo.Context) {
 	//cr.Paint()
 	hour, min, sec := lastTime.Clock()
 	yy, mm, dd := lastTime.Date()
-	hangle := (float64(hour+min/90) * (math.Pi / 6.0)) - math.Pi/2
-	mangle := (float64(min) * (math.Pi / 30.0)) - math.Pi/2
-	sangle := (float64(sec) * (math.Pi / 30.0)) - math.Pi/2
+	hangle := (float64(hour)+float64(min)/90.0)*(math.Pi/6.0) - math.Pi/2
+	mangle := float64(min)*(math.Pi/30.0) - math.Pi/2
+	sangle := float64(sec)*(math.Pi/30.0) - math.Pi/2
 	maxradius := radius - 4
 	cx := wfx / 2
 	cy := wfy / 2

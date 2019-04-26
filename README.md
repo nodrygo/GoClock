@@ -55,9 +55,11 @@ for portability __Racket__ is the best one, no need to struggle for installation
 but for tools chain, building, compilation AOT I prefer __Go__    
 
 __Go__  use the less memory ~40Mo and is the fastest     
-__Racket__ compiled run with ~ 160Mo memory
+__Racket__ compiled run with ~ 160Mo memory        
 __Julia__ run need ~300Mo  of memory    
 
+
+Wil  try to rewrite one with __[V](vlang.io)__ in June when avalaible ;-)    
 
 # TO DO        
 alarm part   
