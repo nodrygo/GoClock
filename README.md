@@ -6,7 +6,8 @@ only tested on Linux Mint 19 64b
 
 mouse Button 3 open POPUP menu
 
-goal is to check complexity against [Racket Clock](https://github.com/nodrygo/RktAlarmClock) and [Julia Clock](https://github.com/nodrygo/jAnalogAlarmClock) 
+# Goal
+check complexity against other same clocks I have wrote in [Racket Clock](https://github.com/nodrygo/RktAlarmClock) and [Julia Clock](https://github.com/nodrygo/jAnalogAlarmClock) 
 
 __Go__ is a very basic and archaic language compared to Racket and Julia   
 __Julia__ is a very good language and  [Luxor](https://github.com/JuliaGraphics/Luxor.jl) is a great help where Go need basic Cairo API     
@@ -19,7 +20,7 @@ __Go__ have good doc but most of modules are juste basic API desc.
 
 # REFACTORING and Source referencing
 __Julia__ and __Racket__ are excellent _(little plus for Julia/Atom)_     
-__Go__ with LiteIDE limited    
+__Go__ with LiteIDE limited  (not Tested Visual studio/Go)  
 
 # Compilation AOT
 __Julia__ is very very slow to compile and the binaries are very big (>300Mo) including lot of shared lib     
@@ -40,7 +41,7 @@ __Go__ provide full stand alone program with no need for shared lib for pure Go 
 # my TOOLS
 for __Julia__ I use Atom : _excellent with Julia_      
 for __Racket__ I use DrRacket : _good_    
-for __Go__ I use [LiteIDE X](https://liteide.org/en/) : _not so bad (better than Atom in my point)_        
+for __Go__ I use [LiteIDE X](https://liteide.org/en/) : _not so bad (better than Atom/Go in my point)_        
 
 # Conclusion 
 As a pleasant language I prefer largely __Julia__ just followed by __Racket__ (and Common Lisp)   
@@ -59,7 +60,7 @@ __Racket__ compiled run with ~ 160Mo memory
 __Julia__ run need ~300Mo  of memory    
 
 
-Wil  try to rewrite one with __[V](https://vlang.io/)__ in June when avalaible ;-)    
+Wil  try to rewrite one with the promising  __[V](https://vlang.io/)__ in June when avalaible ;-)    
 
 # TO DO        
 alarm part   
