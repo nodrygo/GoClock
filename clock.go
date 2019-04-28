@@ -17,20 +17,14 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-const (
-	KEY_LEFT  uint = 65361
-	KEY_UP    uint = 65362
-	KEY_RIGHT uint = 65363
-	KEY_DOWN  uint = 65364
-)
-
 // global var
 var wfx float64
 var wfy float64
 var radius float64
 var lastTime time.Time
+var alarm = Alarm{"00", "00", false}
 
-// return windows size and radius
+// return windows size x y and radius
 func getWinSize(win *gtk.Window) (float64, float64, float64) {
 	wx, wy := win.GetSize()
 	wfx := float64(wx)
@@ -39,7 +33,7 @@ func getWinSize(win *gtk.Window) (float64, float64, float64) {
 	return wfx, wfy, radius
 }
 
-// convert named color to RGB as flot 64 between 0..1 needed for cairo cr
+// convert from given RGB (coming from colornames.xxx) as float 64 between 0..1 needed for cairo cr
 func colorConvert(c color.RGBA) (r, g, b float64) {
 	//fmt.Println("Color is ", c)
 	cr, cg, cb := c.R, c.G, c.B
@@ -50,7 +44,7 @@ func colorConvert(c color.RGBA) (r, g, b float64) {
 	return
 }
 
-// prepare color for stop gradian as color name
+// prepare color for stop gradian
 func stopColorConvertAlpha(stop float64, c color.RGBA, alpha float64) (s, r, g, b, a float64) {
 	//fmt.Println("Color is ", c)
 	cr, cg, cb := colorConvert(c)
@@ -60,10 +54,10 @@ func stopColorConvertAlpha(stop float64, c color.RGBA, alpha float64) (s, r, g, 
 	b = cb
 	s = stop
 	a = alpha
-
 	return
 }
 
+// draw Hour Minute neddle
 func drawHMneddle(cr *cairo.Context, cx, cy, cl, siz float64, col color.RGBA, angle float64) {
 	cr.Save()
 	cr.Translate(cx, cy)
@@ -87,7 +81,7 @@ func drawHMneddle(cr *cairo.Context, cx, cy, cl, siz float64, col color.RGBA, an
 	cr.Restore()
 }
 
-// draw neddles at angle stat at cx,cy for length cl and width siz
+// draw second neddle
 func drawSneddle(cr *cairo.Context, cx, cy, cl, siz float64, col color.RGBA, angle float64) {
 	cr.Save()
 	cr.Translate(cx, cy)
@@ -183,11 +177,11 @@ func drawFace(cr *cairo.Context, cx, cy, radius float64) {
 	cr.Arc(cx, cy, radius, 0, math.Pi*2)
 	cr.Stroke()
 	drawGraduations(cr, cx, cy, radius)
+
 }
 
 // main draw fct when canvas need redraw
 func drawClock(cr *cairo.Context) {
-
 	//cr.SetSourceRGBA(255, 255, 255, 0)
 	//cr.Paint()
 	hour, min, sec := lastTime.Clock()
@@ -235,6 +229,18 @@ func drawClock(cr *cairo.Context) {
 	tdw = tsize.Width / 2
 	cr.MoveTo(cx-tdw, cy-maxradius/6)
 	cr.ShowText(txtdate)
+
+	txtalarm := fmt.Sprintf("%v %s:%s", alarm.activated, alarm.hour, alarm.min)
+	tsize = cr.TextExtents(txtalarm)
+	tdh = tsize.Height + 2
+	tdw = tsize.Width / 2
+	tsize = cr.TextExtents(txtalarm)
+	cr.MoveTo(cx-tdw, cy+maxradius/2.8+tdh)
+	cr.ShowText(txtalarm)
+
+	if alarm.activated && alarm.checkAlarm(hour, min, sec) {
+		fmt.Println("ALARM ALARM ALARM")
+	}
 }
 
 // hack to handle clock time seconds
@@ -290,8 +296,8 @@ func main() {
 		setAboutDlg()
 	})
 	psetAlarm.Connect("activate", func() {
-		fmt.Println("Activate Setalarm")
-		setAlarmDlg()
+		//fmt.Println("Activate/Clear Setalarm")
+		alarm.openAlarmDlg(win)
 	})
 	pquit.Connect("activate", func() {
 		gtk.MainQuit()
@@ -321,12 +327,8 @@ func main() {
 		drawClock(cr)
 	})
 	win.Connect("button-press-event", func(win *gtk.Window, ev *gdk.Event) {
-		//fmt.Println("Event", ev)
 		button := &gdk.EventButton{ev}
 		if button.Button() == 3 {
-			// posx := button.X()
-			// posy := button.Y()
-			//fmt.Println("Button 3 detected ", posx, ":", posy)
 			popupmenu.PopupAtPointer(ev)
 			win.QueueDraw()
 		}

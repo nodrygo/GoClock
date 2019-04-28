@@ -46,7 +46,7 @@ for __Go__ I use [LiteIDE X](https://liteide.org/en/) : _not so bad (better than
 # Conclusion 
 As a pleasant language I prefer largely __Julia__ just followed by __Racket__ (and Common Lisp)   
 __Go__ is very primitive and archaic language with no REPL, no Live code     
-__Go__ error handle is bad and do not permit a direct use for some Fct as param in other    
+__Go__ error handle __is very very anoying and too much verbose__ code plus do not permit a direct use for some Fct as param in other    
 __Go__ func does not permit keys parameters (except bad trick with Map)    
 __Go__ have not Macros, no Complex or Rational Numbers    
 __Go__ by construct is not functional and I love functional programming ;-)
