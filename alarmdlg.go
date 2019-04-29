@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
-	_ "math"
+	"os"
 	"strconv"
-	_ "time"
+	"time"
 
+	"github.com/faiface/beep/mp3"
+	"github.com/faiface/beep/speaker"
+	_ "github.com/faiface/beep/wav"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -16,11 +19,38 @@ type Alarm struct {
 	activated bool
 }
 
+// play sound
+func playSound() {
+	//dir, _ := os.Executable()
+	f, err := os.Open("./Alarm_Clock.mp3")
+	if err != nil {
+		fmt.Println("WAV FILE NOT FOUND ")
+	}
+
+	//s, format, _ := wav.Decode(f)
+	s, format, _ := mp3.Decode(f)
+	if err != nil {
+		fmt.Println("WAV DECODE FAILED")
+	}
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/20))
+	speaker.Play(s)
+	fmt.Println("PLAY SOUND ")
+	//defer streamer.Close()
+
+}
+
+func closeSound() {
+	speaker.Clear()
+}
+
 // check
 func (al *Alarm) checkAlarm(hour, min, second int) bool {
 	hh, _ := strconv.ParseInt(alarm.hour, 10, 0)
 	mm, _ := strconv.ParseInt(alarm.min, 10, 0)
-	if (int(hh) == hour) && (int(mm) == min) && second == 0 {
+	if (int(hh) == hour) && (int(mm) == min) && second >= 0 && second <= 15 {
+		if second == 0 {
+			playSound()
+		}
 		return true
 	}
 	return false
@@ -94,6 +124,8 @@ func (al *Alarm) openAlarmDlg(win *gtk.Window) {
 	tmin.SetEditable(false)
 	lblH, _ := gtk.LabelNew("HOUR")
 	lblM, _ := gtk.LabelNew("MIN")
+	thour.SetText(alarm.hour)
+	tmin.SetText(alarm.min)
 	//MAX SPINNER
 	grid.Attach(lblH, 0, 0, 1, 1)
 	grid.Attach(createButton("UP", thour, 23), 1, 0, 1, 1)
@@ -117,6 +149,7 @@ func (al *Alarm) openAlarmDlg(win *gtk.Window) {
 	if resp == gtk.RESPONSE_ACCEPT {
 		alarm.activated = true
 	} else {
+		closeSound()
 		alarm.activated = false
 	}
 	alarm.hour = hh
@@ -124,6 +157,7 @@ func (al *Alarm) openAlarmDlg(win *gtk.Window) {
 
 	fmt.Printf("HOUR:%s  MIN:%s\n", hh, mm)
 	fmt.Println("ALARM STAT IS", alarm.activated)
+	dlg.Destroy()
 }
 
 // create About DLG

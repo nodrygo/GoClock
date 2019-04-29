@@ -230,16 +230,21 @@ func drawClock(cr *cairo.Context) {
 	cr.MoveTo(cx-tdw, cy-maxradius/6)
 	cr.ShowText(txtdate)
 
-	txtalarm := fmt.Sprintf("%v %s:%s", alarm.activated, alarm.hour, alarm.min)
-	tsize = cr.TextExtents(txtalarm)
-	tdh = tsize.Height + 2
-	tdw = tsize.Width / 2
-	tsize = cr.TextExtents(txtalarm)
-	cr.MoveTo(cx-tdw, cy+maxradius/2.8+tdh)
-	cr.ShowText(txtalarm)
-
-	if alarm.activated && alarm.checkAlarm(hour, min, sec) {
-		fmt.Println("ALARM ALARM ALARM")
+	if alarm.activated {
+		r, g, b := colorConvert(colornames.Firebrick)
+		cr.SetSourceRGB(r, g, b)
+		txtalarm := fmt.Sprintf("%s:%s", alarm.hour, alarm.min)
+		if alarm.checkAlarm(hour, min, sec) && (sec%2 == 0) {
+			txtalarm = fmt.Sprintf("ALARM")
+			r, g, b := colorConvert(colornames.Blueviolet)
+			cr.SetSourceRGB(r, g, b)
+		}
+		tsize = cr.TextExtents(txtalarm)
+		tdh = tsize.Height + 2
+		tdw = tsize.Width / 2
+		tsize = cr.TextExtents(txtalarm)
+		cr.MoveTo(cx-tdw, cy+maxradius/2.8+tdh)
+		cr.ShowText(txtalarm)
 	}
 }
 
@@ -248,7 +253,7 @@ func handleTick(widget *gtk.Widget, frameClock *gdk.FrameClock, userData uintptr
 	_ = frameClock
 	_, _, ls := lastTime.Clock()
 	_, _, sec := time.Now().Clock()
-	if ls != sec {
+	if ls != sec/2 {
 		lastTime = time.Now()
 		widget.QueueDraw()
 	}
