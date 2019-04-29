@@ -104,11 +104,13 @@ func createEntry(txt string) *gtk.Entry {
 
 // set Alarm Dlg button up down for H M activate
 // days select
+// TODO add duration, choice for mp3, add days/week
 func (al *Alarm) openAlarmDlg(win *gtk.Window) {
 	// Dialog init/destroy
 	dlg, _ := gtk.DialogNew()
 	dlg.SetHExpand(true)
 	dlg.SetVExpand(true)
+	dlg.SetTitle("ALARM")
 	dlg.SetParent(win)
 	defer dlg.Destroy()
 
@@ -137,8 +139,8 @@ func (al *Alarm) openAlarmDlg(win *gtk.Window) {
 	grid.Attach(tmin, 2, 1, 1, 1)
 	grid.Attach(createButton("DOWN", tmin, 59), 3, 1, 1, 1)
 
-	dlg.AddButton("CANCEL", gtk.RESPONSE_CANCEL)
-	dlg.AddButton("OK", gtk.RESPONSE_ACCEPT)
+	dlg.AddButton("CLEAR", gtk.RESPONSE_CANCEL)
+	dlg.AddButton("SET", gtk.RESPONSE_ACCEPT)
 
 	dlg.SetModal(true)
 	dlg.ShowAll()
@@ -155,8 +157,8 @@ func (al *Alarm) openAlarmDlg(win *gtk.Window) {
 	alarm.hour = hh
 	alarm.min = mm
 
-	fmt.Printf("HOUR:%s  MIN:%s\n", hh, mm)
-	fmt.Println("ALARM STAT IS", alarm.activated)
+	//fmt.Printf("HOUR:%s  MIN:%s\n", hh, mm)
+	//fmt.Println("ALARM STAT IS", alarm.activated)
 	dlg.Destroy()
 }
 

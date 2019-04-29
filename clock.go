@@ -253,7 +253,7 @@ func handleTick(widget *gtk.Widget, frameClock *gdk.FrameClock, userData uintptr
 	_ = frameClock
 	_, _, ls := lastTime.Clock()
 	_, _, sec := time.Now().Clock()
-	if ls != sec/2 {
+	if ls != sec {
 		lastTime = time.Now()
 		widget.QueueDraw()
 	}
@@ -272,7 +272,7 @@ func main() {
 	// define the popp menu
 	popupmenu, _ := gtk.MenuNew()
 	psetAlarm, _ := gtk.MenuItemNew()
-	psetAlarm.SetLabel("Set Alarm")
+	psetAlarm.SetLabel("Set/Clear Alarm")
 	pswitchDeco, _ := gtk.MenuItemNew()
 	pswitchDeco.SetLabel("Switch decoration")
 	pabout, _ := gtk.MenuItemNew()
@@ -313,13 +313,13 @@ func main() {
 		if win.GetDecorated() {
 			win.SetDecorated(false)
 			win.SetOpacity(0.9)
-			clkcanvas.SetOpacity(0.8)
+			clkcanvas.SetOpacity(1)
 			win.ShowAll()
 
 		} else {
 			win.SetDecorated(true)
 			win.SetOpacity(0.9)
-			clkcanvas.SetOpacity(0.8)
+			clkcanvas.SetOpacity(1)
 			win.ShowAll()
 		}
 	})
