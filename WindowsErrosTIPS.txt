@@ -1,0 +1,9 @@
+On Error:
+go build github.com/gotk3/gotk3/gdk: invalid flag in pkg-config --libs: -Wl,-luuid
+
+correct with: 
+bash -c "sed -i -e 's/-Wl,-luuid/-luuid/g' C:/msys64/mingw64/lib/pkgconfig/gdk-3.0.pc"
+
+
+suppress console (this worked for me): 
+go build -ldflags -H=windowsgui 
