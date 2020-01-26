@@ -32,10 +32,10 @@ __Racket__ is slow to compile and binary size is correct (~18Mo) with required s
 __Racket__ start time is good  
 __Racket__  portability on Windows is very easy and you can create full autonomous exe including everything
   
-__Go__ portability on Windows is scary of complexity (see file WindowsErrosTIPS.txt)    
+__Go__ portability: not easy to install and distribute on Windows (see all bin.zip dll needed)     
 __Go__ is fast to compile and binary size is correct (~16Mo Linux 24Mo Windows)     
 __Go__ start time is fast  
-__Go Gtk__ I have used [gotk3](https://github.com/gotk3/gotk3) correct but need more demos ;-)   
+__Go Gtk__ I have used [gotk3](https://github.com/gotk3/gotk3) good but need more demos ;-)       
 __Go__ not tested cross compilation
 __Go__ provide full stand alone program with no need for shared lib for pure Go program
 
@@ -46,10 +46,10 @@ for __Go__ I use [LiteIDE X](https://liteide.org/en/) : _not so bad (better than
 
 # Conclusion 
 As a pleasant language I prefer largely __Julia__ just followed by __Racket__ (and Common Lisp)   
-__Go__ is very primitive and archaic language with no REPL, no Live code     
-__Go__ error handle __is very very anoying and too much verbose__ code plus do not permit a direct use for some Fct as param in other    
+__Go__ is very basic language with no REPL, no Live code     
+__Go__ error handle __is very very anoying and too much verbose__ 
 __Go__ func does not permit keys parameters (except bad trick with Map)    
-__Go__ have not Macros, no Complex or Rational Numbers    
+__Go__ have not Macros  
 __Go__ by construct is not functional and I love functional programming ;-)
 
 for portability __Racket__ is the best one, no need to struggle for installation everything come from installation including Gui   
@@ -61,9 +61,9 @@ __Racket__ compiled run with ~ 160Mo memory
 __Julia__ run need ~300Mo  of memory    
 
 
-Will  try to rewrite another with the promising  __[V](https://vlang.io/)__ in June when avalaible ;-)    
+Will  try to rewrite another with the promising  __[V](https://vlang.io/)__  when ui avalaible ;-)    
 
 # TO DO        
-alarm part   
-right click menu  (set alarm)  
+change alarm sound
+set duration for alarm
 
